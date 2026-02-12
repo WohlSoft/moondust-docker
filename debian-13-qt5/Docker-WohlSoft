@@ -64,6 +64,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libxxf86vm-dev \
     mesa-common-dev \
     mtdev-tools \
+    rename \
     webp \
     \
     qt5-qmake \

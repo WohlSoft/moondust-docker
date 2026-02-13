@@ -1,0 +1,7 @@
+services:
+  wohlsoft-ci-ubuntu2204-qt5:
+    image: ghcr.io/wohlsoft/wohlsoft-ci-ubuntu2204-qt5
+    build:
+      context: .
+      dockerfile: Docker-WohlSoft
+    container_name: wohlsoft-ci-ubuntu2204-qt5

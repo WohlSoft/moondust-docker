@@ -1,0 +1,37 @@
+FROM ubuntu:bionic
+
+USER root
+
+RUN if getent passwd runner > /dev/null 2>&1; then userdel runner; fi
+RUN groupadd -f -g 1000 runner
+RUN useradd -ms /bin/bash -r -u 1000 -g 1000 runner
+
+RUN apt-get update -qq
+ENV TZ=Europe/Moscow
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN mkdir -p /usr/local/etc/php/conf.d
+RUN printf '[PHP]\ndate.timezone = "Europe/Moscow"\n' > /usr/local/etc/php/conf.d/tzone.ini
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq apt-utils
+RUN apt-get upgrade -qq
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq software-properties-common
+RUN apt-get update -qq
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    sudo git \
+    gcc-8 g++-8 cmake build-essential make wget "^libxcb.*" libx11-dev libx11-xcb-dev libxcursor-dev libxrender-dev libxrandr-dev \
+    libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libxkbcommon-x11-dev \
+    libfontconfig1-dev libharfbuzz-dev \
+    libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp \
+    libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev \
+    libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev \
+    libproxy-dev libgtk2.0-dev libgtk-3-dev libcups2-dev libxcb-xkb-dev xkb-data libxkbfile-dev \
+    libclang-dev \
+    ninja-build
+
+RUN echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
+
+USER 1000:1000
+
+WORKDIR /home/runner/repos
+CMD ["bash"]

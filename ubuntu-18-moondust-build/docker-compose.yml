@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  moondust-build-u18:
+    image: ubuntu:bionic
+    build:
+      context: ../../
+      dockerfile: moondust-docker/ubuntu-18/Docker-Moondust
+    container_name: moondust-build-u18
+    volumes:
+      - ../../:/home/runner/repos

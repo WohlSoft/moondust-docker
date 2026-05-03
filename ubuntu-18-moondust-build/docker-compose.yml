@@ -1,11 +1,9 @@
-version: '2'
-
 services:
-  moondust-build-u18:
-    image: ubuntu:bionic
+  wohlsoft-ci-ubuntu1804-moondust-build:
+    image: ghcr.io/wohlsoft/wohlsoft-ci-ubuntu1804-moondust-build
     build:
       context: ../../
-      dockerfile: moondust-docker/ubuntu-18/Docker-Moondust
-    container_name: moondust-build-u18
+      dockerfile: moondust-docker/ubuntu-18-moondust-build/Docker-Moondust
+    container_name: wohlsoft-ci-ubuntu1804-moondust-build
     volumes:
       - ../../:/home/runner/repos

@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:18.04
 
 USER root
 
@@ -12,22 +12,81 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN mkdir -p /usr/local/etc/php/conf.d
 RUN printf '[PHP]\ndate.timezone = "Europe/Moscow"\n' > /usr/local/etc/php/conf.d/tzone.ini
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq apt-utils
-RUN apt-get upgrade -qq
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq software-properties-common
-RUN apt-get update -qq
+RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -qq
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -qq apt-utils software-properties-common
+# RUN DEBIAN_FRONTEND=noninteractive add-apt-repository -y "ppa:git-core/ppa"
+
+# Alternative while Launchpad.Net is dead
+RUN echo "deb [trusted=yes] https://mirror.yandex.ru/mirrors/launchpad/git-core/ppa/ bionic main" > /etc/apt/sources.list.d/git-core-ppa-mirror.list
+RUN echo "deb-src [trusted=yes] https://mirror.yandex.ru/mirrors/launchpad/git-core/ppa/ bionic main" > /etc/apt/sources.list.d/git-core-ppa-mirror.list
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq
+
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    sudo git \
-    gcc-8 g++-8 cmake build-essential make wget "^libxcb.*" libx11-dev libx11-xcb-dev libxcursor-dev libxrender-dev libxrandr-dev \
-    libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libxkbcommon-x11-dev \
-    libfontconfig1-dev libharfbuzz-dev \
-    libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp \
-    libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev \
-    libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev \
-    libproxy-dev libgtk2.0-dev libgtk-3-dev libcups2-dev libxcb-xkb-dev xkb-data libxkbfile-dev \
+    build-essential \
+    cmake \
+    g++-8 \
+    gcc-8 \
+    make \
+    mesa-common-dev \
+    mtdev-tools \
+    ninja-build \
+    sudo \
+    udev \
+    webp \
+    wget \
+    xkb-data \
+    \
+    libasound2-dev \
     libclang-dev \
-    ninja-build
+    libcups2-dev \
+    libdbus-1-dev \
+    libegl1-mesa-dev \
+    libfontconfig1-dev \
+    libgl1-mesa-dev \
+    libgles2-mesa \
+    libgles2-mesa-dev \
+    libglm-dev \
+    libglu1-mesa-dev \
+    libgtk2.0-dev \
+    libgtk-3-dev \
+    libharfbuzz-dev \
+    libproxy-dev \
+    libpulse-dev \
+    libudev-dev \
+    libwayland-dev \
+    libx11-dev \
+    libx11-xcb-dev \
+    "^libxcb.*" \
+    libxcb-xkb-dev \
+    libxcursor-dev \
+    libxext-dev \
+    libxi-dev \
+    libxinerama-dev \
+    libxkbcommon-dev \
+    libxkbcommon-x11-dev \
+    libxkbfile-dev \
+    libxrandr-dev \
+    libxrender-dev \
+    libxss-dev \
+    libxt-dev \
+    libxv-dev \
+    libxxf86vm-dev
+
+RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh -O cmake-kit.sh
+RUN chmod uog+x cmake-kit.sh
+RUN ./cmake-kit.sh --skip-license --prefix=/usr
+RUN rm -f cmake-kit.sh
+
+RUN wget -q -d -nv -t 5 -O git-man.deb          https://wohlsoft.ru/docs/Software/git-man_2.50.1-0ppa1~ubuntu18.04.1_all.deb
+RUN wget -q -d -nv -t 5 -O git.deb              https://wohlsoft.ru/docs/Software/git_2.50.1-0ppa1~ubuntu18.04.1_amd64.deb
+RUN wget -q -d -nv -t 5 -O libreadline6.deb     https://wohlsoft.ru/docs/Software/libreadline6_6.3-8_amd64-ubuntu1804.deb
+RUN wget -q -d -nv -t 5 -O lftp.deb             https://wohlsoft.ru/docs/Software/lftp_4.9.1-1_amd64-ubuntu1604.deb
+RUN apt-get install -y ./git.deb ./git-man.deb
+RUN dpkg -i ./libreadline6.deb
+RUN dpkg -i ./lftp.deb
+
+RUN git config --global --add safe.directory '*'
 
 RUN echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
 

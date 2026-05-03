@@ -7,7 +7,7 @@ docker pull ghcr.io/wohlsoft/wohlsoft-ci-ubuntu1804-moondust-build:latest
 
 To run the image and do the stuff inside it:
 ```
-docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:rw wohlsoft-ci-ubuntu1804-moondust-build -it bash
+docker run -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:rw ghcr.io/wohlsoft/wohlsoft-ci-ubuntu1804-moondust-build bash
 ```
 
 

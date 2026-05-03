@@ -1,0 +1,98 @@
+FROM ubuntu:18.04
+
+USER root
+
+RUN if getent passwd runner > /dev/null 2>&1; then userdel runner; fi
+RUN groupadd -f -g 1000 runner
+RUN useradd -ms /bin/bash -r -u 1000 -g 1000 runner
+
+RUN apt-get update -qq
+ENV TZ=Europe/Moscow
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN mkdir -p /usr/local/etc/php/conf.d
+RUN printf '[PHP]\ndate.timezone = "Europe/Moscow"\n' > /usr/local/etc/php/conf.d/tzone.ini
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
+# RUN DEBIAN_FRONTEND=noninteractive add-apt-repository -y "ppa:git-core/ppa"
+
+# Alternative while Launchpad.Net is dead
+RUN echo "deb [trusted=yes] https://mirror.yandex.ru/mirrors/launchpad/git-core/ppa/ bionic main" > /etc/apt/sources.list.d/git-core-ppa-mirror.list
+RUN echo "deb-src [trusted=yes] https://mirror.yandex.ru/mirrors/launchpad/git-core/ppa/ bionic main" > /etc/apt/sources.list.d/git-core-ppa-mirror.list
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq
+
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    build-essential \
+    cmake \
+    g++-8 \
+    gcc-8 \
+    git \
+    make \
+    mesa-common-dev \
+    mtdev-tools \
+    ninja-build \
+    sudo \
+    udev \
+    webp \
+    wget \
+    xkb-data \
+    \
+    libasound2-dev \
+    libclang-dev \
+    libcups2-dev \
+    libdbus-1-dev \
+    libegl1-mesa-dev \
+    libfontconfig1-dev \
+    libgl1-mesa-dev \
+    libgles2-mesa \
+    libgles2-mesa-dev \
+    libglm-dev \
+    libglu1-mesa-dev \
+    libgtk2.0-dev \
+    libgtk-3-dev \
+    libharfbuzz-dev \
+    libproxy-dev \
+    libpulse-dev \
+    libudev-dev \
+    libwayland-dev \
+    libx11-dev \
+    libx11-xcb-dev \
+    "^libxcb.*" \
+    libxcb-xkb-dev \
+    libxcursor-dev \
+    libxext-dev \
+    libxi-dev \
+    libxinerama-dev \
+    libxkbcommon-dev \
+    libxkbcommon-x11-dev \
+    libxkbfile-dev \
+    libxrandr-dev \
+    libxrender-dev \
+    libxss-dev \
+    libxt-dev \
+    libxv-dev \
+    libxxf86vm-dev
+
+RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh -O cmake-kit.sh
+RUN chmod uog+x cmake-kit.sh
+RUN ./cmake-kit.sh --skip-license --prefix=/usr
+RUN rm -f cmake-kit.sh
+RUN git config --global --add safe.directory '*'
+
+RUN wget -q -d -nv -t 5 -O libreadline6.deb     https://wohlsoft.ru/docs/Software/libreadline6_6.3-8_amd64-ubuntu1804.deb
+RUN wget -q -d -nv -t 5 -O lftp.deb             https://wohlsoft.ru/docs/Software/lftp_4.9.1-1_amd64-ubuntu1604.deb
+RUN dpkg -i ./libreadline6.deb
+RUN dpkg -i ./lftp.deb
+
+RUN wget -q -d -nv -t 5 -O qt.tar.bz2           https://wohlsoft.ru/docs/Software/QtBuilds/qt-5.15.10-static-ubuntu-18-04-x64-gcc8.tar.bz2
+RUN mkdir -p /home/runner/Qt
+RUN chown runner:runner -R /home/runner/Qt
+RUN tar -xf qt.tar.bz2 -C /home/runner/Qt 
+
+RUN echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
+
+USER 1000:1000
+
+WORKDIR /home/runner/repos
+CMD ["bash"]

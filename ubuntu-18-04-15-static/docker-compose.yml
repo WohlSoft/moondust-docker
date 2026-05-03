@@ -1,0 +1,7 @@
+services:
+  wohlsoft-ci-ubuntu1804-qt5-static:
+    image: ghcr.io/wohlsoft/wohlsoft-ci-ubuntu1804-qt5-static
+    build:
+      context: .
+      dockerfile: Docker-WohlSoft
+    container_name: wohlsoft-ci-ubuntu1804-qt5-static

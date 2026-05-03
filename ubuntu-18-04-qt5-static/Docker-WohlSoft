@@ -87,7 +87,7 @@ RUN wget -q -d -nv -t 5 -O lftp.deb             https://wohlsoft.ru/docs/Softwar
 RUN tar -xf ninja.tar.gz -C /usr/bin
 RUN apt-get install -y ./git.deb ./git-man.deb ./libreadline6.deb ./lftp.deb
 
-RUN wget -q -d -nv -t 5 -O qt.tar.bz2           https://wohlsoft.ru/docs/Software/QtBuilds/qt-5.15.10-static-ubuntu-18-04-x64-gcc8.tar.bz2
+RUN wget -q -d -nv -t 5 -O qt.tar.bz2           https://wohlsoft.ru/docs/Software/QtBuilds/qt-5.15.18-static-ubuntu-18-04-x64-gcc8.tar.bz2
 RUN mkdir -p /home/runner/Qt
 RUN chown runner:runner -R /home/runner/Qt
 RUN tar -xf qt.tar.bz2 -C /home/runner/Qt 

@@ -78,13 +78,17 @@ RUN chmod uog+x cmake-kit.sh
 RUN ./cmake-kit.sh --skip-license --prefix=/usr
 RUN rm -f cmake-kit.sh
 
+RUN wget -q -d -nv -t 5 -O ninja.tar.gz         https://wohlsoft.ru/docs/Software/ninja-1.13.2-linux-x86_64.tar.gz
 RUN wget -q -d -nv -t 5 -O git-man.deb          https://wohlsoft.ru/docs/Software/git-man_2.50.1-0ppa1~ubuntu18.04.1_all.deb
 RUN wget -q -d -nv -t 5 -O git.deb              https://wohlsoft.ru/docs/Software/git_2.50.1-0ppa1~ubuntu18.04.1_amd64.deb
 RUN wget -q -d -nv -t 5 -O libreadline6.deb     https://wohlsoft.ru/docs/Software/libreadline6_6.3-8_amd64-ubuntu1804.deb
 RUN wget -q -d -nv -t 5 -O lftp.deb             https://wohlsoft.ru/docs/Software/lftp_4.9.1-1_amd64-ubuntu1604.deb
-RUN apt-get install -y ./git.deb ./git-man.deb
-RUN dpkg -i ./libreadline6.deb
-RUN dpkg -i ./lftp.deb
+
+RUN tar -xf ninja.tar.gz -C /usr/bin
+RUN apt-get install -y ./git.deb ./git-man.deb ./libreadline6.deb ./lftp.deb
+
+# Clean-Up!
+RUN rm -f *.deb *.tar.gz *.tar.bz2
 
 RUN git config --global --add safe.directory '*'
 
